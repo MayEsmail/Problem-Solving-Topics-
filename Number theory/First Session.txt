@@ -1,0 +1,135 @@
+// content : Divisors , Primes , Prime factorization
+type def long long lol
+
+1) Divisors:
+      if we have integer n , Divisors(n) are set of values that n is divisable by them;
+      e.g : Divisors(24) are  1, 2, 3, 4, 6, 8, 12, 24
+      to find divisors in O(n)
+      vector<int>v;
+      for(int i=1; i<=n; i++){
+	  if(!(n%i))v.push_back(i);
+      }
+   but their's a notice helped to minimize order :
+      eg divisors of 24
+	1	|	24/1 = 24
+	2	|	24/2 = 12
+	3	|	24/3 = 3
+	4	|	24/4 = 6
+      1,2,3,4,6,8,12,24 are all divisors of 24
+      
+      eg divisors of 16
+ 	1	|	16/1 = 16
+	2	|	16/2 = 8
+	4	|	16/4 = 4
+      1,2,4,8,16 are all divisors of 16
+  so we notice that we can find all devisors of any integer by finding devisors <= it's square root
+  vector<int>v;
+  lol i;
+  for(i=1;i*i<n;i++)				//not <= because if the n is divsable by it's square root  (square root is integer) it will be repeated in vector
+      if(!(n%i)){v.push_back(i);	v.push_back(n/i);}
+  if(!(n%i))v.push_back(i);	//checking square root
+
+
+2)Primes
+   we say a number n is prime if it has only 2 divisors .. 1 and n
+   you're given a number and you're asked to determine if it's prime or not
+   we care about dvisors so we'll use the same logic, using bool prime as a flag and search for divisors in range [2,n-1]   
+   
+   //O(n)
+   bool prime =1;	//assume n is prime 
+   for(int i=2; i<n; i++){
+       if(!(n%i)){prime=0;	break;}
+   }
+   
+   prime? printf("prime\n") : printf("not prime\n");
+   but we can iterate only to square root (by the same logic as divisors)
+   
+   //O(sqrt(n))
+   bool prime =1;	//assume n is prime 
+   for(lol i=2; i*i<=n; i++){
+       if(!(n%i)){prime=0;	break;}
+   }
+   prime? printf("prime\n") : printf("not prime\n");
+   
+   we can optimize this code by iterating only in odd numbers 
+   //O(sqrt(n))		->	O(0.5* sqrt(n)) but 0.5 is constant
+   for(lol i=2; i*i<=n; i=i+(i&1)+1){
+       if(!(n%i)){prime=0;	break;}
+   }
+   prime? printf("prime\n") : printf("not prime\n");
+
+   if you're given multiple queries asking if number m is prime or not but you know all queries will be in range n
+   if you used privious way for each prime it'll cost O(n*sqrt(n)) , but we can use Sieve algorithm to find all primes in range n in O(nlog(n))
+              then answer quetries in O(1)
+   
+   bitset<N>isprime;
+   vector<int>primes;
+   void sieve(){
+	isprime.set();
+	isprime[0]=isprime[1]=0;
+	for(int i=2; i<=n ;i++){
+	    if(isprime[i]){
+		primes.push_back(i);
+		for(int j=2*i;j<=n;j+=i)
+		    isprime[j]=0;
+	    }
+	}
+   }
+
+   we can optimize this code by iterating only to sqrt(n), in this case the bitset will have true values for the entire range (n)
+   O(nlog(log(n)))
+   bitset<N>isprime;
+   void sieve(){
+	isprime.set();
+	isprime[0]=isprime[1]=0;
+	for(int i=2; i*i<=n ;i++){
+	    if(isprime[i]){
+		for(int j=i*i;j<=n;j+=i)
+		    isprime[j]=0;
+	    }
+	}
+   }
+
+
+3)Prime factorization
+   to know prime factors of 1 integer n
+   eg n=180
+	180 | 2
+	 90 | 2
+	 45 | 3
+	 15 | 3
+	  5 | 5
+	  1 |
+   so : factors(180) are 2,2,3,3,5	=>	180= 2^2 + 3^2 + 5
+   O(sqrt(n))
+   unordered_map<int,int>factors;              // to store factors in <power,exponent>form
+    for(lol i=2; i*i<=n; i++){
+    	int ctr = 0;			      // to count exponent of each prime factor
+      	while(!(n%i)){n/=i;	ctr++;}
+        if(ctr) factors[i]=ctr;
+    }
+    if(n>1)factors[n]=1;     //if remaining > 1 then the ramaining value is prime
+
+    but if you're given multiple queries, each of which is asking for prime factors of m , you know m<=n (the range is n)
+    by previous way you can answer in O(n.sqrt(n))
+    Optimization -> we'll prepare factors array in O(nloglog(n)) as pre-processing and then answer each query in O(log m)
+    
+    int factors[N];
+    // preparing factors array
+    void factorize(){
+	iota(factors,factors+n,0);
+	for(lol i=2; i*i<=n; i++){
+	   for(int j=2*i; j<=n; j+=i){
+	      factors[j]=i;
+	   }
+	}
+    }
+    int main(){
+	factorize();
+	cin>>n>>q;
+	while(q--){
+	   cin>>m;
+	   //find factors
+	   while(m>1){printf("%d",factors[m]);		m/=factors[m];}
+    }
+    }
