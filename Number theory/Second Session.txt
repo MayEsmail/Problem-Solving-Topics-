@@ -1,0 +1,85 @@
+// content : number of Divisors, GCD, LCM, Mod operations,fast power with mod
+
+1)Number Of Divisors
+   if you know prime factors of a number nb
+	   n=P1^e1 * P2^e2 * P3^e3 * .... * Pn^en
+	   number of devisors of n is : (e1+1)*(e2+1)*(e3+1)*.....*(en+1)
+
+   you can also know num of devisors for each number in range N using sieve
+
+   int Divs_num[N];
+   void sieve(){
+      fill(Divs_num,Divs_num+N,1);
+      int num,e;
+      for(int i = 2; i*i<=N; i++){
+    	  if(Divs_num[i]==1)Divs_num[i]=2;
+    	  else continue;
+    	  for(int j = 2*i; j<=N; j+=i){
+       		e = 0;	num = j;
+       		while(!(num%i)){e++;	num/=i;}
+       		Divs_num[j]*=(e+1);
+    	  }
+      }
+   }
+
+2)GCD : greatest common devisor
+   keep track of prime factors of numbers n,m
+   case 1: if n is divisable by m
+   eg n=2016               ,       m=72
+       =2^5 * 3^2 * 7               =2^3 * 3^2
+      all powers of primes factors of m are <= powers of primes factors of n
+      and prime factors of m are subset of prime factors of n
+      gcd(n,m)=m
+   case 2: if gcd(n,m)>1
+   eg  n=2016		  ,	    m=120
+        =2^5 * 3^2 * 7               =2^3 * 3 * 5
+        in these cases n,m have a set of common prime factors, gcd(n,m)=each prime facor in this set with it's minimum power in n or m
+        gcd(2016,120)= 2^3 * 3 =24
+   case 3: if gcd(n,m)=1
+   eg   n=72              ,         m=25
+         =2^3 * 3^2                  =5^2
+        in these cases n,m have no common prime factors
+        gcd(72,25)=1
+
+   Code:
+       int gcd(int a, int b){
+       	   if(b==0) return a;
+           return gcd(b, a%b);}
+       or use the builtin function : __gcd(a,b);
+
+
+3)LCM : least common multiple
+    if we have 2 numbers a,b .. we know well one of their common multiples, it's a*b
+    but at most that is not the LCM(n,m)
+    we can use gcd to know the lcm
+    lcm(a,b)= a*b/__gcd(a,b)
+    
+    Code:
+      int lcm(int a, int b){
+	  return (a*b)/gcd(a,b);
+      }
+
+
+4)Mod operations
+   a % m  = ((a % m) + m)%m	//for general case of a (negative or positive)
+  (a+b)%m = ((a % m)+(b % m))%m
+  (a-b)%m = ((a % m)–(b % m)+m)%m
+  (a*b)%m = ((a % m)*(b % m))%m
+  (a^b)%m = (a^(b %(m-1))) % m  = ((a % m)^b)%m
+
+
+5)fast power with mod		to calculate (b^power)%m in O(log power)
+
+  Code:
+     typedef long long lol;
+      lol fast_power(lol b, lol power, lol m){ 
+    	  lol res = 1; 
+          b %= mod;   
+    	  while(power){ 
+             if (power&1) res=(res*b)%m;  
+             power/=2; 
+             b=(b*b)%m;
+          } 
+          return res; 
+       }
+   
